@@ -8,68 +8,67 @@
   <style>
     * { box-sizing: border-box; }
 
-body {
-  margin: 0;
-  background: #f9f9fe;
-  font-family: "Quicksand", "Nunito", "Segoe UI", Roboto, Arial, sans-serif;
-  min-height: 100vh;
-  padding-top: 40px;
-}
+    body {
+      margin: 0;
+      background: #f9f9fe;
+      font-family: "Quicksand", "Nunito", "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      padding-top: 40px;
+    }
 
-.resultado {
- background: linear-gradient(135deg, #243a70 0%, #325395 100%);
-  border-radius: 18px;
-  color: #fff;
-  border-radius: 28px;
-  padding: 35px 16px 45px;
-  text-align: center;
-  box-shadow: 0 18px 30px rgba(30, 40, 80, 0.30);
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-}
+    .resultado {
+      background: linear-gradient(135deg, #263a6e 0%, #345293 100%);
+      color: #fff;
+      border-radius: 18px;
+      padding: 35px 16px 45px;
+      text-align: center;
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.27);
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+    }
 
-h1, h2, .fecha {
-  color: #364255;
-  font-weight: 600;
-  text-shadow: 0 3px 4px rgba(255,255,255,.7), 0 3px 6px rgba(255,255,255,.3);
-}
+    h1, h2, .fecha {
+      color: #364255;
+      font-weight: 600;
+      text-shadow: 0 3px 4px rgba(255,255,255,.7), 0 3px 6px rgba(255,255,255,.3);
+    }
 
-h1 {
-  font-size: clamp(34px, 8.6vw, 52px);
-  letter-spacing: 0;
-  line-height: 1.25;
-  margin: 0 0 26px;
-}
+    h1 {
+      font-size: clamp(34px, 8.6vw, 52px);
+      letter-spacing: 0;
+      line-height: 1.25;
+      margin: 0 0 26px;
+    }
 
-h2 {
-  font-size: clamp(34px, 8.6vw, 52px);
-  line-height: 1.48;
-  margin: 0;
-}
+    h2 {
+      font-size: clamp(34px, 8.6vw, 52px);
+      line-height: 1.48;
+      margin: 0;
+    }
 
-.fecha {
-  font-size: clamp(34px, 8.6vw, 52px);
-  line-height: 1.48;
-  margin: 0;
-}
+    .fecha {
+      font-size: clamp(34px, 8.6vw, 52px);
+      line-height: 1.48;
+      margin: 0;
+    }
 
-.registro {
-  font-size: clamp(16px, 4.1vw, 23px);
-  font-weight: 400;
-  line-height: 1.25;
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
+    .registro {
+      font-size: clamp(16px, 4.1vw, 23px);
+      font-weight: 400;
+      line-height: 1.25;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
 
-.numero {
-  font-size: clamp(30px, 8.4vw, 60px);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.25;
-  margin-top: 47px;
-  text-shadow: 0 0 5px rgba(255,255,255,.7), 0 0 2px #fff;
-}
+    .numero {
+      font-size: clamp(30px, 8.4vw, 60px);
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.25;
+      margin-top: 47px;
+      text-shadow: 0 0 5px rgba(255,255,255,.7), 0 0 2px #fff;
+    }
   </style>
 </head>
 
@@ -84,38 +83,19 @@ h2 {
 
   <script>
     /*
-     * Ejemplo de URL:
-     * ?numero=94330&registro=2026-10-09T15:13:10.9066667&sorteo=OAX%2051MIL
+     * Ejemplo de URL (la genera el QR del boleto):
+     * ?id=OAX-153MIL-2026-10-29
      *
-     * También se puede enviar:
-     * ?numero=94330&registro=2026-10-09T15:13:10&bono=51
-     *
-     * La fecha se toma de "fecha" si se proporciona; si no,
-     * se toman los primeros 10 caracteres de "registro".
+     * El número ganador se calcula con la fecha del sorteo:
+     * mismo día = mismo número para todos los boletos,
+     * otro día = otro número.
      */
 
     const DIAS = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
     const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
                    "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 
-    const p = new URLSearchParams(window.location.search);
-
-    const numero = p.get("numero");
-    const registro = p.get("registro");
-    const sorteo = p.get("sorteo");
-    const bono = p.get("bono");
-    const estado = p.get("estado") || "OAX";
-    let fechaISO = p.get("fecha");
-
-    if (!fechaISO && registro) {
-      fechaISO = registro.slice(0, 10);
-    }
-
     function formatoFecha(iso) {
-      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
-        return "--/--/---/--";
-      }
-
       const [a, m, d] = iso.split("-").map(Number);
       const f = new Date(a, m - 1, d);
 
@@ -123,31 +103,47 @@ h2 {
              MESES[m - 1] + "/" + String(a).slice(2);
     }
 
-    const numeroValido = numero !== null && /^\d{5}$/.test(numero);
+    // Mismo día = mismo número. Otro día = otro número.
+    function numeroDelDia(fechaISO) {
+      const s = "OAX-" + fechaISO + "-proyecto-escolar";
+      let h = 2166136261;
 
-    document.getElementById("numero").textContent =
-      numeroValido ? numero : "-----";
-
-    document.getElementById("registro").textContent =
-      registro || "Sin registro";
-
-    document.getElementById("fecha").textContent =
-      formatoFecha(fechaISO);
-
-    function nombreSorteo() {
-      if (sorteo) return sorteo;
-
-      const n = Number(bono);
-
-      if (bono && n > 0) {
-        const miles = n >= 1000 ? n / 1000 : n;
-        return estado + " " + miles + "MIL";
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
       }
 
-      return "----";
+      return String((h >>> 0) % 100000).padStart(5, "0");
     }
 
-    document.getElementById("sorteo").textContent = nombreSorteo();
+    function hoyISO() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+
+      return d.getFullYear() + "-" + mm + "-" + dd;
+    }
+
+    const id = new URLSearchParams(window.location.search).get("id") || "";
+    const partes = id.match(/^([A-Z]+)-(\d+(?:\.\d+)?(?:MIL)?)-(\d{4}-\d{2}-\d{2})$/);
+
+    if (partes) {
+      const fecha = partes[3];
+
+      document.getElementById("sorteo").textContent = partes[1] + " " + partes[2];
+      document.getElementById("fecha").textContent = formatoFecha(fecha);
+
+      if (fecha > hoyISO()) {
+        document.getElementById("numero").textContent = "-----";
+        document.getElementById("registro").textContent = "Resultado pendiente";
+      } else {
+        document.getElementById("numero").textContent = numeroDelDia(fecha);
+        document.getElementById("registro").textContent = fecha + "T00:00:00";
+      }
+    } else {
+      document.getElementById("numero").textContent = "-----";
+      document.getElementById("registro").textContent = "Sin registro";
+    }
   </script>
 </body>
 </html>
