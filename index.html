@@ -17,19 +17,19 @@
     }
 
     .resultado {
-      background: linear-gradient(135deg, #263a6e 0%, #345293 100%);
+      background: linear-gradient(135deg, #1e3a6f 0%, #2d5298 100%);
       color: #fff;
       border-radius: 18px;
-      padding: 35px 16px 45px;
+      padding: 34px 16px 45px;
       text-align: center;
-      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.27);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.27), 0 3px 8px rgba(0, 0, 0, 0.10);
       width: 100%;
       max-width: 720px;
       margin: 0 auto;
     }
 
     h1, h2, .fecha {
-      color: #364255;
+      color: #334255;
       font-weight: 600;
       text-shadow: 0 3px 4px rgba(255,255,255,.7), 0 3px 6px rgba(255,255,255,.3);
     }
@@ -38,13 +38,13 @@
       font-size: clamp(34px, 8.6vw, 52px);
       letter-spacing: 0;
       line-height: 1.25;
-      margin: 0 0 26px;
+      margin: 0 0 25.5px;
     }
 
     h2 {
       font-size: clamp(34px, 8.6vw, 52px);
       line-height: 1.48;
-      margin: 0;
+      margin: 0 0 1.5px;
     }
 
     .fecha {
@@ -66,7 +66,7 @@
       font-weight: 400;
       letter-spacing: 0;
       line-height: 1.25;
-      margin-top: 47px;
+      margin-top: 48px;
       text-shadow: 0 0 5px rgba(255,255,255,.7), 0 0 2px #fff;
     }
   </style>
@@ -116,6 +116,17 @@
       return String((h >>> 0) % 100000).padStart(5, "0");
     }
 
+    // Siempre en miles: "153MIL", "153" y "153000" salen como 153MIL
+    function aMil(texto) {
+      const n = parseFloat(texto);
+
+      if (!n) return "----";
+
+      const mil = (/MIL/i.test(texto) || n < 1000) ? n : n / 1000;
+
+      return (Math.round(mil * 10) / 10) + "MIL";
+    }
+
     function hoyISO() {
       const d = new Date();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -130,7 +141,7 @@
     if (partes) {
       const fecha = partes[3];
 
-      document.getElementById("sorteo").textContent = partes[1] + " " + partes[2];
+      document.getElementById("sorteo").textContent = partes[1] + " " + aMil(partes[2]);
       document.getElementById("fecha").textContent = formatoFecha(fecha);
 
       if (fecha > hoyISO()) {
