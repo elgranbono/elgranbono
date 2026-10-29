@@ -20,7 +20,7 @@
       background: linear-gradient(135deg, #2a4480 0%, #34528f 100%);
       color: #fff;
       border-radius: 28px;
-      padding: 62px 16px 60px;
+      padding: 38px 16px 43px;
       text-align: center;
       box-shadow: 0 18px 30px rgba(30, 40, 80, 0.30);
       width: 100%;
@@ -28,49 +28,50 @@
       margin: 0 auto;
     }
 
-    /* Título, sorteo y fecha: gris azulado con brillo blanco, como en la original */
+    /* Título, sorteo y fecha: gris azulado con brillo blanco */
     h1, h2, .fecha {
       color: #3f4a63;
       font-weight: 600;
-      text-shadow: 0 0 10px rgba(255,255,255,.85), 0 0 4px rgba(255,255,255,.85);
+      text-shadow: 0 0 10px rgba(255,255,255,.85),
+                   0 0 4px rgba(255,255,255,.85);
     }
 
     h1 {
-      font-size: clamp(32px, 8.2vw, 50px);
-      margin: 0 0 54px;
+      font-size: clamp(32px, 9.2vw, 50px);
+      margin: 0 0 31px;
     }
 
     h2 {
       font-size: clamp(34px, 8.6vw, 52px);
-      line-height: 1.25;
+      line-height: 1.42;
       margin: 0;
     }
 
     .fecha {
       font-size: clamp(34px, 8.6vw, 52px);
-      line-height: 1.25;
+      line-height: 1.42;
       margin: 0;
     }
 
     .registro {
       font-size: clamp(16px, 3.9vw, 22px);
       font-weight: 400;
-      margin-top: 26px;
+      margin-top: 14px;
       overflow-wrap: anywhere;
     }
 
     .numero {
-      font-size: clamp(48px, 11vw, 66px);
-      font-weight: 600;
+      font-size: clamp(30px, 11vw, 60px);
+      font-weight: 500;
       letter-spacing: 1px;
-      margin-top: 62px;
-      text-shadow: 0 0 12px rgba(255,255,255,.85), 0 0 4px rgba(255,255,255,.85);
+      margin-top: 44px;
+      text-shadow: 0 0 8px rgba(255,255,255,.6),
+                   0 0 3px rgba(255,255,255,.6);
     }
   </style>
 </head>
 
 <body>
-
   <div class="resultado">
     <h1>Resultado del Sorteo</h1>
     <h2 id="sorteo">----</h2>
@@ -81,52 +82,70 @@
 
   <script>
     /*
-     * Enlace que debe abrir tu app (todo sale del boleto):
-     *   ?numero=94330&registro=2026-10-09T15:13:10.9066667&sorteo=OAX 51MIL
-     * Otra opción para el sorteo: mandar solo el monto del bono
-     *   &bono=51   (o &bono=51000)  ->  se muestra "OAX 51MIL"
-     * La fecha se toma del registro (fecha de creación del boleto).
+     * Ejemplo de URL:
+     * ?numero=94330&registro=2026-10-09T15:13:10.9066667&sorteo=OAX%2051MIL
+     *
+     * También se puede enviar:
+     * ?numero=94330&registro=2026-10-09T15:13:10&bono=51
+     *
+     * La fecha se toma de "fecha" si se proporciona; si no,
+     * se toman los primeros 10 caracteres de "registro".
      */
-    const DIAS  = ["DOM","LUN","MAR","MIE","JUE","VIE","SAB"];
-    const MESES = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+
+    const DIAS = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+    const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
+                   "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 
     const p = new URLSearchParams(window.location.search);
 
-    const numero   = p.get("numero");
+    const numero = p.get("numero");
     const registro = p.get("registro");
-    const sorteo   = p.get("sorteo");
-    const bono     = p.get("bono");
-    const estado   = p.get("estado") || "OAX";
-    let   fechaISO = p.get("fecha");
+    const sorteo = p.get("sorteo");
+    const bono = p.get("bono");
+    const estado = p.get("estado") || "OAX";
+    let fechaISO = p.get("fecha");
 
-    // Si no viene "fecha", se toma de los primeros 10 caracteres del registro
-    if (!fechaISO && registro) fechaISO = registro.slice(0, 10);
+    if (!fechaISO && registro) {
+      fechaISO = registro.slice(0, 10);
+    }
 
-    // 2026-10-09 -> VIE/9/OCT/26
     function formatoFecha(iso) {
-      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "--/--/---/--";
+      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        return "--/--/---/--";
+      }
+
       const [a, m, d] = iso.split("-").map(Number);
       const f = new Date(a, m - 1, d);
-      return DIAS[f.getDay()] + "/" + d + "/" + MESES[m - 1] + "/" + String(a).slice(2);
+
+      return DIAS[f.getDay()] + "/" + d + "/" +
+             MESES[m - 1] + "/" + String(a).slice(2);
     }
 
     const numeroValido = numero !== null && /^\d{5}$/.test(numero);
 
-    document.getElementById("numero").textContent   = numeroValido ? numero : "-----";
-    document.getElementById("registro").textContent = registro || "Sin registro";
-    document.getElementById("fecha").textContent    = formatoFecha(fechaISO);
-    // Nombre del sorteo: completo (sorteo=OAX 51MIL) o armado con el monto (bono=51)
+    document.getElementById("numero").textContent =
+      numeroValido ? numero : "-----";
+
+    document.getElementById("registro").textContent =
+      registro || "Sin registro";
+
+    document.getElementById("fecha").textContent =
+      formatoFecha(fechaISO);
+
     function nombreSorteo() {
       if (sorteo) return sorteo;
+
       const n = Number(bono);
+
       if (bono && n > 0) {
         const miles = n >= 1000 ? n / 1000 : n;
         return estado + " " + miles + "MIL";
       }
+
       return "----";
     }
+
     document.getElementById("sorteo").textContent = nombreSorteo();
   </script>
-
 </body>
 </html>
