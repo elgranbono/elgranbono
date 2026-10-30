@@ -85,11 +85,10 @@
     /*
      * Ejemplo de URL (la genera el QR del boleto):
      * ?id=OAX-153MIL-2026-10-29
-     *
-     * El número ganador se calcula con la fecha del sorteo:
-     * mismo día = mismo número para todos los boletos,
-     * otro día = otro número.
      */
+
+    // ✏️ CAMBIA AQUÍ EL NÚMERO GANADOR CUANDO QUIERAS
+    const NUMERO_GANADOR = "38632";
 
     const DIAS = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
     const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
@@ -101,19 +100,6 @@
 
       return DIAS[f.getDay()] + "/" + d + "/" +
              MESES[m - 1] + "/" + String(a).slice(2);
-    }
-
-    // Mismo día = mismo número. Otro día = otro número.
-    function numeroDelDia(fechaISO) {
-      const s = "OAX-" + fechaISO + "-proyecto-escolar";
-      let h = 2166136261;
-
-      for (let i = 0; i < s.length; i++) {
-        h ^= s.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-
-      return String((h >>> 0) % 100000).padStart(5, "0");
     }
 
     // Siempre en miles: "153MIL", "153" y "153000" salen como 153MIL
@@ -148,7 +134,7 @@
         document.getElementById("numero").textContent = "-----";
         document.getElementById("registro").textContent = "Resultado pendiente";
       } else {
-        document.getElementById("numero").textContent = numeroDelDia(fecha);
+        document.getElementById("numero").textContent = NUMERO_GANADOR;
         document.getElementById("registro").textContent = fecha + "T00:00:00";
       }
     } else {
